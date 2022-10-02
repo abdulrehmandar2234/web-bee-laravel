@@ -37,7 +37,87 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        Schema::create('movies', function($table) {
+            $table->id();
+            $table->string('title');
+            $table->text('description');
+            $table->dateTime('duration');
+            $table->string('language');
+            $table->dateTime('release_date');
+            $table->string('country');
+            $table->string('genre');
+            $table->timestamps();
+        });
+
+        Schema::create('cities', function($table) {
+            $table->id();
+            $table->string('name');
+            $table->string('state');
+            $table->string('zip_code');
+            $table->timestamps();
+        });
+
+        Schema::create('cinemas', function($table) {
+            $table->id();
+            $table->dateTime('name');
+            $table->integer('total_cinema_hall');
+            $table->foreignId('city_id')->constrained('cities');
+            $table->timestamps();
+        });
+
+        Schema::create('cinema_halls', function($table) {
+            $table->id();
+            $table->dateTime('name');
+            $table->integer('total_seats');
+            $table->foreignId('cinema_id')->constrained('cities');
+            $table->timestamps();
+        });
+
+        Schema::create('cinema_seats', function($table) {
+            $table->id();
+            $table->integer('seat_number');
+            $table->integer('type');
+            $table->integer('percentage');
+            $table->foreignId('cinema_hall_id')->constrained('cinema_halls');
+            $table->timestamps();
+        });
+
+        Schema::create('shows', function($table) {
+            $table->id();
+            $table->dateTime('date');
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->foreignId('movie_id')->constrained('movies');
+            $table->foreignId('cinema_hall_id')->constrained('cinema_halls');
+            $table->timestamps();
+        });
+
+        Schema::create('bookings', function($table) {
+            $table->id();
+            $table->integer('no_of_seats');
+            $table->integer('status');
+            $table->foreignId('show_id')->constrained('shows');
+            $table->foreignId('user_id')->constrained('users');
+            $table->timestamps();
+        });
+
+        Schema::create('show_seats', function($table) {
+            $table->id();
+            $table->integer('status');
+            $table->float('price');
+            $table->foreignId('show_id')->constrained('shows');
+            $table->foreignId('cinema_seat_id')->constrained('cinema_seats');
+            $table->foreignId('booking_id')->constrained('bookings');
+            $table->timestamps();
+        });
+
+        Schema::create('payments', function($table) {
+            $table->id();
+            $table->float('amount');
+            $table->integer('payment_method');
+            $table->foreignId('booking_id')->constrained('bookings');
+            $table->timestamps();
+        });
     }
 
     /**
